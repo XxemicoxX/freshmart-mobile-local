@@ -1,11 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { Alert, FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootParams } from '../../navigation/tipos';
 import { useCarrito } from '../../context/CarritoContext';
-import { crearPedido } from '../../api/pedidos';
 import ImagenProducto from '../../components/ImagenProducto';
 import Boton from '../../components/Boton';
 import MensajeVacio from '../../components/MensajeVacio';
@@ -16,7 +15,6 @@ import { ItemCarrito } from '../../types';
 export default function CarritoScreen() {
   const nav = useNavigation<NativeStackNavigationProp<RootParams>>();
   const { carrito, recargar, cambiarCantidad, quitar, vaciar } = useCarrito();
-  const [procesando, setProcesando] = useState(false);
 
   useFocusEffect(useCallback(() => { recargar(); }, [recargar]));
 
@@ -30,19 +28,7 @@ export default function CarritoScreen() {
       { text: 'Vaciar', style: 'destructive', onPress: () => intentar(vaciar) },
     ]);
 
-  const finalizar = async () => {
-    if (!carrito?.tienda) return nav.navigate('SeleccionTienda', { desdeCarrito: true });
-    setProcesando(true);
-    try {
-      const pedido = await crearPedido();
-      await recargar();
-      nav.navigate('Pago', { pedidoId: pedido.id });
-    } catch (e: any) {
-      Alert.alert('No se pudo crear el pedido', e.message);
-    } finally {
-      setProcesando(false);
-    }
-  };
+  const finalizar = () => nav.navigate('Pago');
 
   if (!carrito || carrito.items.length === 0) {
     return <MensajeVacio icono="cart-outline" titulo="Tu carrito está vacío" detalle="Agrega productos desde el catálogo." accion="Ir al catálogo" onAccion={() => nav.navigate('Tabs', { screen: 'Inicio' })} />;
@@ -75,20 +61,13 @@ export default function CarritoScreen() {
         keyExtractor={(i) => String(i.productoId)}
         renderItem={renderItem}
         contentContainerStyle={{ padding: 12 }}
-        ListHeaderComponent={
-          <Pressable style={styles.tienda} onPress={() => nav.navigate('SeleccionTienda', { desdeCarrito: true })}>
-            <Ionicons name="location-outline" size={18} color={colores.primarioOscuro} />
-            <Text style={styles.tiendaTexto}>{carrito.tienda ? `Recojo en ${carrito.tienda.nombre}` : 'Elige la tienda de recojo'}</Text>
-            <Text style={styles.cambiar}>{carrito.tienda ? 'Cambiar' : 'Elegir'}</Text>
-          </Pressable>
-        }
         ListFooterComponent={<Pressable onPress={confirmarVaciar} style={{ alignItems: 'center', padding: 12 }}><Text style={{ color: colores.error, fontWeight: '600' }}>Vaciar carrito</Text></Pressable>}
       />
       <View style={styles.resumen}>
         <Fila etiqueta="Subtotal" valor={soles(carrito.subtotal)} />
         <Fila etiqueta={`IGV (${Math.round(carrito.igv * 100)}%)`} valor={soles(carrito.impuestos)} />
         <Fila etiqueta="Total" valor={soles(carrito.total)} grande />
-        <Boton titulo={carrito.tienda ? 'Continuar al pago' : 'Elegir tienda y continuar'} onPress={finalizar} cargando={procesando} estilo={{ marginTop: 10 }} />
+        <Boton titulo="Continuar al pago" onPress={finalizar} estilo={{ marginTop: 10 }} />
       </View>
     </View>
   );
@@ -105,9 +84,6 @@ function Fila({ etiqueta, valor, grande }: { etiqueta: string; valor: string; gr
 
 const styles = crearEstilos(() => ({
   fondo: { flex: 1, backgroundColor: colores.fondo },
-  tienda: { flexDirection: 'row', alignItems: 'center', gap: 6, padding: 12, borderRadius: radio, backgroundColor: colores.primarioClaro, marginBottom: 10 },
-  tiendaTexto: { flex: 1, color: colores.primarioOscuro, fontWeight: '600' },
-  cambiar: { color: colores.primario, fontWeight: '700' },
   item: { flexDirection: 'row', gap: 12, backgroundColor: colores.superficie, padding: 10, borderRadius: radio, marginBottom: 10, borderWidth: 1, borderColor: colores.borde },
   foto: { width: 70, height: 70, borderRadius: 8 },
   nombre: { fontWeight: '600', color: colores.texto },

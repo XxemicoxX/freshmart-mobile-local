@@ -52,10 +52,8 @@ export default function LoginScreen({ navigation }: Props) {
       <Boton titulo="Crear una cuenta" variante="secundario" onPress={() => navigation.navigate('Registro')} />
       {MODO_DEMO ? (
         <View style={styles.demo}>
-          <Text style={styles.demoTitulo}>Modo demo (sin servidor)</Text>
+          <Text style={styles.demoTitulo}>Cuenta por default</Text>
           <Text style={styles.demoTexto}>Cliente: {CUENTAS_DEMO.cliente.correo} / {CUENTAS_DEMO.cliente.password}</Text>
-          <Text style={styles.demoTexto}>Personal: {CUENTAS_DEMO.personal.correo} / {CUENTAS_DEMO.personal.password}</Text>
-          <Text style={styles.demoTexto}>También puedes crear tu propio usuario.</Text>
         </View>
       ) : null}
     </Pantalla>

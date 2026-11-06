@@ -9,8 +9,20 @@
       "package": "pe.freshmart.mobile"
     },
     "plugins": [
-      ["expo-build-properties", { "android": { "usesCleartextTraffic": true } }],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "429bf9d7-af5f-4c6d-9c41-76c724b14f81"
+      }
+    }
   }
 }

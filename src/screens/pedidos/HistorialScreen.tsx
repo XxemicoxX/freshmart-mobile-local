@@ -1,17 +1,14 @@
 import React, { useCallback, useState } from 'react';
-import { Alert, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootParams } from '../../navigation/tipos';
 import { historial, resumenHistorial } from '../../api/pedidos';
-import Boton from '../../components/Boton';
 import Cargando from '../../components/Cargando';
 import EtiquetaEstado from '../../components/EtiquetaEstado';
 import MensajeVacio from '../../components/MensajeVacio';
 import { colores, radio, crearEstilos } from '../../theme/colores';
 import { fechaHora, soles } from '../../utils/formato';
-import { reportePedidosPdf } from '../../utils/pdf';
-import { useAuth } from '../../context/AuthContext';
 import { PedidoResumen, ResumenHistorial } from '../../types';
 
 export default function HistorialScreen() {
@@ -20,15 +17,6 @@ export default function HistorialScreen() {
   const [resumen, setResumen] = useState<ResumenHistorial | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [refrescando, setRefrescando] = useState(false);
-  const { usuario } = useAuth();
-
-  const exportar = async () => {
-    try {
-      await reportePedidosPdf({ titulo: 'Reporte de compras', subtitulo: `Cliente: ${usuario?.nombres} ${usuario?.apellidos} (${usuario?.correo})`, pedidos: pedidos ?? [], resumen });
-    } catch (e: any) {
-      Alert.alert('Reporte', e.message ?? 'No se pudo generar el PDF.');
-    }
-  };
 
   const cargar = useCallback(async () => {
     try {
@@ -56,13 +44,10 @@ export default function HistorialScreen() {
       contentContainerStyle={{ padding: 12, flexGrow: 1 }}
       refreshControl={<RefreshControl refreshing={refrescando} onRefresh={() => { setRefrescando(true); cargar(); }} />}
       ListHeaderComponent={resumen ? (
-        <View>
-          <View style={styles.resumen}>
-            <Dato valor={String(resumen.cantidadPedidos)} etiqueta="Pedidos" />
-            <Dato valor={String(resumen.pedidosEntregados)} etiqueta="Entregados" />
-            <Dato valor={soles(resumen.totalComprado)} etiqueta="Total comprado" />
-          </View>
-          {pedidos.length > 0 ? <Boton titulo="Exportar reporte (PDF)" variante="secundario" onPress={exportar} estilo={{ marginBottom: 12 }} /> : null}
+        <View style={styles.resumen}>
+          <Dato valor={String(resumen.cantidadPedidos)} etiqueta="Pedidos" />
+          <Dato valor={String(resumen.pedidosEntregados)} etiqueta="Entregados" />
+          <Dato valor={soles(resumen.totalComprado)} etiqueta="Total comprado" />
         </View>
       ) : null}
       ListEmptyComponent={<MensajeVacio icono="receipt-outline" titulo="Aún no tienes pedidos" detalle="Cuando compres, aparecerán aquí." />}

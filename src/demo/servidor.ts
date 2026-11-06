@@ -90,8 +90,10 @@ function usuarioDe(token: string | null, d: Db): UsuarioDb {
 function exigirRol(u: UsuarioDb, rol: Rol) {
   if (u.rol !== rol) throw err(403, 'No tienes permiso para realizar esta acción.');
 }
+const STOCK_INICIAL = 50; // productos y tiendas añadidos después de crear los datos parten con este stock
+const leerStock = (d: Db, productoId: number, tiendaId: number) => d.stock[`${productoId}-${tiendaId}`] ?? STOCK_INICIAL;
 const stockDe = (d: Db, productoId: number, tiendaId: number | null) =>
-  tiendaId ? d.stock[`${productoId}-${tiendaId}`] ?? 0 : Math.max(...TIENDAS.map((t) => d.stock[`${productoId}-${t.id}`] ?? 0));
+  tiendaId ? leerStock(d, productoId, tiendaId) : Math.max(...TIENDAS.map((t) => leerStock(d, productoId, t.id)));
 
 function productoDto(d: Db, id: number, tiendaId: number | null): Producto {
   const p = PRODUCTOS[id - 1];
@@ -154,7 +156,7 @@ function cambiarEstado(d: Db, p: PedidoDb, nuevo: EstadoPedido, mensaje?: string
   p.etiqueta = ETIQUETAS[nuevo];
   p.seguimiento.push({ estado: nuevo, etiqueta: ETIQUETAS[nuevo], fecha: ahora() });
   if (nuevo === 'CANCELADO' && !p.pagado) {
-    p.items.forEach((i) => { d.stock[`${i.productoId}-${p.tienda.id}`] += i.cantidad; });
+    p.items.forEach((i) => { d.stock[`${i.productoId}-${p.tienda.id}`] = leerStock(d, i.productoId, p.tienda.id) + i.cantidad; });
   }
   notificar(d, p.uid, 'PEDIDO', `Tu pedido ${p.codigo}: ${ETIQUETAS[nuevo]}`, mensaje ?? `El estado de tu pedido ${p.codigo} cambió a "${ETIQUETAS[nuevo]}".`, `/pedidos/${p.id}`);
 }
@@ -369,7 +371,7 @@ function manejar(d: Db, metodo: string, p: string[], q: URLSearchParams, cuerpo:
       const tienda = TIENDAS.find((t) => t.id === cr.tiendaId)!;
       cr.items.forEach((i) => validarCantidad(d, u.id, i.productoId, i.cantidad));
       const dto = carritoDto(d, u.id);
-      cr.items.forEach((i) => { d.stock[`${i.productoId}-${tienda.id}`] -= i.cantidad; });
+      cr.items.forEach((i) => { d.stock[`${i.productoId}-${tienda.id}`] = leerStock(d, i.productoId, tienda.id) - i.cantidad; });
       const id = d.sig.pedido++;
       const fecha = ahora();
       const pedido: PedidoDb = {

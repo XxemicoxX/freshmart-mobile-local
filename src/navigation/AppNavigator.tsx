@@ -13,7 +13,6 @@ import RegistroScreen from '../screens/auth/RegistroScreen';
 import RecuperarScreen from '../screens/auth/RecuperarScreen';
 import RestablecerScreen from '../screens/auth/RestablecerScreen';
 import ProductoScreen from '../screens/catalogo/ProductoScreen';
-import SeleccionTiendaScreen from '../screens/carrito/SeleccionTiendaScreen';
 import PagoScreen from '../screens/pedidos/PagoScreen';
 import PedidoDetalleScreen from '../screens/pedidos/PedidoDetalleScreen';
 import NotificacionesScreen from '../screens/notificaciones/NotificacionesScreen';
@@ -67,8 +66,7 @@ export default function AppNavigator() {
           <>
             <Stack.Screen name="Tabs" component={ClienteTabs} options={{ headerShown: false }} />
             <Stack.Screen name="Producto" component={ProductoScreen} options={{ title: 'Producto' }} />
-            <Stack.Screen name="SeleccionTienda" component={SeleccionTiendaScreen} options={{ title: 'Elige tu tienda' }} />
-            <Stack.Screen name="Pago" component={PagoScreen} options={{ title: 'Pago' }} />
+            <Stack.Screen name="Pago" component={PagoScreen} options={{ title: 'Pagar' }} />
             <Stack.Screen name="PedidoDetalle" component={PedidoDetalleScreen} options={{ title: 'Detalle del pedido' }} />
             <Stack.Screen name="Notificaciones" component={NotificacionesScreen} options={{ title: 'Notificaciones' }} />
             <Stack.Screen name="EditarPerfil" component={EditarPerfilScreen} options={{ title: 'Editar perfil' }} />

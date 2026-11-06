@@ -14,8 +14,7 @@ import { Categoria, Producto } from '../../types';
 
 export default function InicioScreen() {
   const nav = useNavigation<NativeStackNavigationProp<RootParams>>();
-  const { carrito, agregar } = useCarrito();
-  const tiendaId = carrito?.tienda?.id ?? null;
+  const { agregar } = useCarrito();
 
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [categoriaId, setCategoriaId] = useState<number | null>(null);
@@ -35,7 +34,7 @@ export default function InicioScreen() {
   const cargar = useCallback(async (p: number) => {
     try {
       setError(null);
-      const r = await listarProductos({ categoriaId, q: busqueda, tiendaId, pagina: p });
+      const r = await listarProductos({ categoriaId, q: busqueda, pagina: p });
       setProductos((prev) => (p === 0 ? r.contenido : [...prev, ...r.contenido]));
       setPagina(r.pagina);
       setTotalPaginas(r.totalPaginas);
@@ -45,7 +44,7 @@ export default function InicioScreen() {
       setCargando(false);
       setCargandoMas(false);
     }
-  }, [categoriaId, busqueda, tiendaId]);
+  }, [categoriaId, busqueda]);
 
   useEffect(() => { setCargando(true); cargar(0); }, [cargar]);
 
@@ -83,14 +82,6 @@ export default function InicioScreen() {
           <Ionicons name="notifications-outline" size={24} color={colores.primarioOscuro} />
         </Pressable>
       </View>
-
-      <Pressable style={styles.tienda} onPress={() => nav.navigate('SeleccionTienda')}>
-        <Ionicons name="location-outline" size={18} color={colores.primarioOscuro} />
-        <Text style={styles.tiendaTexto} numberOfLines={1}>
-          {carrito?.tienda ? `Recojo en ${carrito.tienda.nombre}` : 'Elige la tienda donde recogerás tu pedido'}
-        </Text>
-        <Ionicons name="chevron-forward" size={16} color={colores.primarioOscuro} />
-      </Pressable>
 
       <View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
@@ -136,8 +127,6 @@ const styles = crearEstilos(() => ({
   buscador: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: colores.superficie, borderRadius: radio, paddingHorizontal: 12, borderWidth: 1, borderColor: colores.borde },
   input: { flex: 1, paddingVertical: 10, paddingHorizontal: 8, fontSize: 15, color: colores.texto },
   campana: { padding: 8 },
-  tienda: { flexDirection: 'row', alignItems: 'center', gap: 6, marginHorizontal: 12, padding: 10, borderRadius: radio, backgroundColor: colores.primarioClaro },
-  tiendaTexto: { flex: 1, color: colores.primarioOscuro, fontWeight: '600', fontSize: 13 },
   chips: { paddingHorizontal: 12, paddingVertical: 10, gap: 8 },
   chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 999, backgroundColor: colores.superficie, borderWidth: 1, borderColor: colores.borde },
   chipActivo: { backgroundColor: colores.primario, borderColor: colores.primario },

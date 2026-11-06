@@ -16,15 +16,15 @@ import { Producto } from '../../types';
 type Props = NativeStackScreenProps<RootParams, 'Producto'>;
 
 export default function ProductoScreen({ route, navigation }: Props) {
-  const { carrito, agregar } = useCarrito();
+  const { agregar } = useCarrito();
   const [producto, setProducto] = useState<Producto | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [cantidad, setCantidad] = useState(1);
   const [agregando, setAgregando] = useState(false);
 
   useEffect(() => {
-    detalleProducto(route.params.id, carrito?.tienda?.id).then(setProducto).catch((e) => setError(e.message));
-  }, [route.params.id, carrito?.tienda?.id]);
+    detalleProducto(route.params.id).then(setProducto).catch((e) => setError(e.message));
+  }, [route.params.id]);
 
   if (error) return <MensajeVacio icono="alert-circle-outline" titulo="No se pudo cargar el producto" detalle={error} />;
   if (!producto) return <Cargando />;

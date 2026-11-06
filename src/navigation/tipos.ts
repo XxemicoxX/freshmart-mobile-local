@@ -11,8 +11,7 @@ export type RootParams = {
   // Cliente
   Tabs: NavigatorScreenParams<TabsParams>;
   Producto: { id: number };
-  SeleccionTienda: { desdeCarrito?: boolean } | undefined;
-  Pago: { pedidoId: number };
+  Pago: { pedidoId?: number } | undefined;
   PedidoDetalle: { id: number };
   Notificaciones: undefined;
   EditarPerfil: undefined;

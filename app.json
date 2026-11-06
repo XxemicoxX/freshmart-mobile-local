@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "Freshmart",
+    "slug": "freshmart-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "android": {
+      "package": "pe.freshmart.mobile"
+    },
+    "plugins": [
+      ["expo-build-properties", { "android": { "usesCleartextTraffic": true } }],
+      "expo-secure-store"
+    ]
+  }
+}
